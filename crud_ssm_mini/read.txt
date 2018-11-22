@@ -1,0 +1,1 @@
+SSM框架(Spring+MyBatis+SpringMVC)与前端miniUI框架的整合，完成本次实例，CRUD操作；
