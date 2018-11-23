@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mk.emp.dao.EmployeeMapper">
+	
+	<resultMap type="com.mk.emp.entry.EmployeeBean" id="EmpBean">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="gender" property="gender"/>
+		<result column="email" property="email" />
+		<result column="salary" property="salary" />
+		
+		<association property="dept" javaType="com.mk.emp.entry.DeptBean">
+			<result column="deptName" property="name"/>
+		</association>
+	</resultMap>
+	
+	<!-- 分页查询 -->
+	<select id="selectEmps" resultMap="EmpBean">
+		SELECT emp.*,dept.name deptName FROM emp LEFT JOIN dept ON emp.d_id = dept.id 
+		LIMIT #{arg0}, #{arg1}
+	</select>
+	<!-- 查询表中记录数 -->
+	<select id="selectCountOfEmps" resultType="int">
+		SELECT count(1) FROM emp
+	</select>
+	
+	
+	
+</mapper>
