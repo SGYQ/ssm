@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>员工信息列表</title>
+	
+	<link rel="stylesheet" type="text/css" href="../../static/css/bootstrap.min.css"/>
+	<style type="text/css">
+		th{text-align:center;}
+		td{text-align:center;}
+	</style>
+</head>
+<body>
+	
+	<!-- 页面内容 start -->
+	<div class="container" id="listPages">
+		<!-- 标题 -->
+		<div class="row">
+			<h4>用户列表</h4>
+		</div>
+		
+		<!-- 按钮 -->
+		<div class="row">
+			<div class="col-md-4 col-md-offset-8">
+				<button class="btn btn-primary">新增</button>
+				<button class="btn btn-danger">删除</button>
+			</div>
+		</div>
+		
+		<!-- 列表 start -->
+		<div class="row" >
+			<div class="col-md-12">
+				<table class="table table-hover">
+					<tr>
+						<th><input type="checkbox" id=""/></th>
+						<th>编号</th>
+						<th>姓名</th>
+						<th>性别</th>
+						<th>邮箱</th>
+						<th>薪资</th>
+						<th>所在部门</th>
+						<th>操作</th>
+					</tr>
+					<tr v-for="emp in list">
+						<td><input type="checkbox" id=""/></td>
+						<td>{{emp.id}}</td>
+						<td>{{emp.name}}</td>
+						<td>{{emp.gender==1?'女':'男'}}</td>
+						<td>{{emp.email}}</td>
+						<td>{{emp.salary}}</td>
+						<td>随意部门</td>
+						<td>
+							<button class="btn btn-primary btn-sm">
+								<span class="glyphicon" aria-hidden="true"></span>
+								编辑
+							</button>
+							<button class="btn btn-danger btn-sm">
+								<span class="glyphicon" aria-hidden="true"></span>
+								删除
+							</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<!-- end 列表 -->
+			
+		<!-- 分页信息 start -->
+		<div class="row">
+			<!--分页文字信息  -->
+			<div class="col-md-6">第{{pageNum}} / {{pages}}页,共{{total}}条记录</div>
+			<!-- 分页条信息 -->
+			<div class="col-md-6">
+				<nav aria-label="Page navigation">
+				<ul class="pagination">
+					<!-- 改 -->
+					<!-- 首页 -->
+					<li><span @click="varyPage(1)">首页</span></li> 
+					<!-- 上一页 -->
+                	<li v-bind:class="{'disabled': !hasPreviousPage}">
+                		<span aria-hidden="true" @click="varyPage(--pageNum)">&laquo;</span>
+                	</li>
+                	<!-- 导航条 -->
+               		<li v-for="page_num in navigatepageNums" v-bind:class="{'active':page_num==pageNum}">
+               			<span @click="varyPage(page_num)">{{page_num}}</span>
+               		</li>
+               		
+               		<!--下一页-->
+                	<li v-bind:class="{'disabled': !hasNextPage}">
+                		<span aria-hidden="true" @click="varyPage(++pageNum)">&raquo;</span>
+                	</li>
+                	<!-- 尾页 -->
+                	<li><span @click="varyPage(pages)">尾页</span></li> 
+                	
+				</ul>
+				</nav>
+			</div>
+		</div>
+		<!-- end 分页信息 -->
+		
+	</div>
+	<!-- end  页面内容  -->
+	
+	<script type="text/javascript" src="../../static/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../../static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../static/js/vue.js"></script>
+	<script type="text/javascript">
+		var url = "queryEmps?pn=1";
+		new Vue({
+			el: "#listPages",
+			data:{ 
+				   list: [],
+				    navigatepageNums: [],
+				    pageNum: 1,
+				    pageSize: 5,
+				    pages: 0,
+				    size: 5,
+				    total: 0,
+				    hasNextPage: false,
+				    hasPreviousPage: false
+			},
+			methods: {
+				getEmps: function(pageIndex) {
+					self = this; //必不可少
+					$.ajax({
+						url: 'queryEmps?pn='+pageIndex,
+						type: 'GET',
+						success: function(jsonStr) {
+							var jsonObject = JSON.parse(jsonStr); //将json串转化成JSON对象
+							
+							self.list = jsonObject.list;
+			                self.navigatepageNums = jsonObject.navigatepageNums;
+			                self.pageNum = jsonObject.pageNum;
+			                self.pageSize = jsonObject.pageSize;
+			                self.pages = jsonObject.pages;
+			                self.size = jsonObject.size;
+			                self.total = jsonObject.total;
+			                
+			                self.hasNextPage = jsonObject.hasNextPage;
+			                self.hasPreviousPage = jsonObject.hasPreviousPage;
+			                
+			                //console.log("后台传值: "+jsonObject.navigatepageNums);//navigatepageNums
+			                //console.log("前台实际导航条: "+self.navigatepageNums);
+						}
+					
+					});
+				},
+				varyPage: function(pageIndex) {
+                    if( pageIndex<=0 )
+                        this.pageNum = 1;
+                    else
+                        this.pageNum = pageIndex;
+                    
+                    this.getEmps(pageIndex); //获取数据
+                }
+				
+			},
+			mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
+		        self=this;
+		        fetch(url).then(function(response) {
+		            response.json().then(function (jsonObject) {
+
+		            	self.list = jsonObject.list;
+		                self.navigatepageNums = jsonObject.navigatepageNums;
+		                self.pageNum = jsonObject.pageNum;
+		                self.pageSize = jsonObject.pageSize;
+		                self.pages = jsonObject.pages;
+		                self.size = jsonObject.size;
+		                self.total = jsonObject.total;
+		                
+		                self.hasNextPage = jsonObject.hasNextPage;
+		                self.hasPreviousPage = jsonObject.hasPreviousPage;
+		                
+		            })
+		        }).catch(function(err){
+		            console.log("Fetch错误:"+err);
+		        })
+		    }
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主页</title>
+</head>
+<body>
+
+	<h4>crud，SSM+Bootstrap+Vue.js的操作，摸索。。。</h4>
+
+	<a href="view/employee/employees" >信息列表</a><br/>
+	
+	<div id="t">
+		<a v-bind:href="'view/employee/te?index='+(index-1)" target="_blank">测试</a>
+	</div>
+	
+	
+	
+	<script type="text/javascript" src="static/js/vue.js"></script>
+	<script type="text/javascript">
+		new Vue({
+			el: "#t",
+			data:{
+				arr:[1,2,3,4],
+				index: 3
+			}
+		});
+	</script>
+</body>
+</html>
