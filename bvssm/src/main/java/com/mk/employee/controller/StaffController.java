@@ -2,6 +2,8 @@ package com.mk.employee.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.util.StringUtil;
 import com.mk.employee.entry.Employee;
 import com.mk.employee.service.StaffService;
 
@@ -34,6 +37,11 @@ public class StaffController
 		return "test";
 	}
 	
+	/**
+	 * 分页查询
+	 * @param pn
+	 * @return
+	 */
 	@RequestMapping("/queryEmps")
 	@ResponseBody
 	public String queryEmployees( @RequestParam(value="pn",defaultValue="1")Integer pn )
@@ -46,6 +54,24 @@ public class StaffController
 		PageInfo<Employee> pageInfo = new PageInfo<Employee>(list,5);
 		
 		return JSON.toJSONString(pageInfo);
+	}
+	
+	/**
+	 * 单个删除，根据员工编号
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/clearEmp")
+	@ResponseBody
+	public String dropEmpInfoById(HttpServletRequest request)
+	{
+		String id = request.getParameter("id");
+		String mes  = "";
+		
+		if( !StringUtil.isEmpty(id) )
+			mes = staffService.removeEmpById( Integer.parseInt(id) )==1?"删除成功!":"删除失败!";
+		
+		return mes;
 	}
 	
 }

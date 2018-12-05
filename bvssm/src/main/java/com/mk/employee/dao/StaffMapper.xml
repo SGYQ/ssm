@@ -3,9 +3,22 @@
 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mk.employee.dao.StaffMapper">
+	<resultMap type="com.mk.employee.entry.Employee" id="empWithDept">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="gender" property="gender"/>
+		<result column="email" property="email" />
+		<result column="salary" property="salary" />
+		
+		<association property="dept" javaType="com.mk.employee.entry.Department">
+			<result column="deptName" property="name"/>
+		</association>
+	</resultMap>
 
-	<select id="selectList" resultType="com.mk.employee.entry.Employee">
-		SELECT * FROM emp
+	<!-- 多表查询， -->
+	<select id="selectList" resultMap="empWithDept">
+		SELECT emp.*,dept.name deptName 
+		FROM emp LEFT JOIN dept on emp.d_id=dept.id
 	</select>
 	<!-- 查询表中记录数 -->
 	<select id="selectCountOfEmp" resultType="int">

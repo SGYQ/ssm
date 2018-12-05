@@ -27,4 +27,15 @@ public class StaffService
 	{
 		return staffDao.selectCountOfEmp();
 	}
+	
+	/**
+	 * 根据员工编号单个删除信息
+	 * @param id
+	 * @return
+	 */
+	public int removeEmpById(int id)
+	{
+		return staffDao.deleteEmployeeById(id);
+	}
+	
 }

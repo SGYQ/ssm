@@ -41,20 +41,20 @@
 						<th>所在部门</th>
 						<th>操作</th>
 					</tr>
-					<tr v-for="emp in list">
+					<tr v-for="emp in list" :key="emp.id">
 						<td><input type="checkbox" id=""/></td>
 						<td>{{emp.id}}</td>
 						<td>{{emp.name}}</td>
 						<td>{{emp.gender==1?'女':'男'}}</td>
 						<td>{{emp.email}}</td>
 						<td>{{emp.salary}}</td>
-						<td>随意部门</td>
+						<td>{{emp.dept.name}}</td>
 						<td>
 							<button class="btn btn-primary btn-sm">
 								<span class="glyphicon" aria-hidden="true"></span>
 								编辑
 							</button>
-							<button class="btn btn-danger btn-sm">
+							<button class="btn btn-danger btn-sm" @click="clearInfo(emp.id)">
 								<span class="glyphicon" aria-hidden="true"></span>
 								删除
 							</button>
@@ -120,7 +120,7 @@
 				    hasPreviousPage: false
 			},
 			methods: {
-				getEmps: function(pageIndex) {
+				getEmps: function(pageIndex) {  //获取一页
 					self = this; //必不可少
 					$.ajax({
 						url: 'queryEmps?pn='+pageIndex,
@@ -145,13 +145,29 @@
 					
 					});
 				},
-				varyPage: function(pageIndex) {
+				varyPage: function(pageIndex) {  //更新页面索引，然后更新数据
                     if( pageIndex<=0 )
                         this.pageNum = 1;
                     else
                         this.pageNum = pageIndex;
-                    
-                    this.getEmps(pageIndex); //获取数据
+                    //获取数据
+                    this.getEmps(pageIndex); 
+                },
+                clearInfo: function(id) { //根据 id删除数据
+                	//this.list.splice(key,1);  //???
+                	console.log("编号: "+id);
+                	$.ajax({
+                		url: "clearEmp",
+                		type:"POST",
+                		data:{"id":id},
+                		success: function(text){
+                			//console.log(text);
+                			alert(text);
+                		}
+                	});
+                	//不可放在success中
+                	var pageIndex = this.pageNum;
+        			this.getEmps(pageIndex);//重新获取该页数据(本页刷新)
                 }
 				
 			},
