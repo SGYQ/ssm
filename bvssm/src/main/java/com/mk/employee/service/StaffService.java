@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mk.employee.dao.StaffMapper;
 import com.mk.employee.entry.Employee;
@@ -36,6 +37,22 @@ public class StaffService
 	public int removeEmpById(int id)
 	{
 		return staffDao.deleteEmployeeById(id);
+	}
+	
+	/**
+	 * 多项删除，根据编号
+	 * @param ids
+	 * @return
+	 */
+	@Transactional(rollbackFor=RuntimeException.class)
+	public int removeEmpByIds(int[] ids)
+	{
+		int counts = 0;
+		
+		for(int i=0,len=ids.length; i<len; i++)
+			counts += staffDao.deleteEmployeeById( ids[i] );
+			
+		return counts;
 	}
 	
 }

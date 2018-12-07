@@ -6,8 +6,8 @@
 	
 	<link rel="stylesheet" type="text/css" href="../../static/css/bootstrap.min.css"/>
 	<style type="text/css">
-		th{text-align:center;}
-		td{text-align:center;}
+		th{ text-align:center;}
+		td{ text-align:center;}
 	</style>
 </head>
 <body>
@@ -23,7 +23,7 @@
 		<div class="row">
 			<div class="col-md-4 col-md-offset-8">
 				<button class="btn btn-primary">新增</button>
-				<button class="btn btn-danger">删除</button>
+				<button class="btn btn-danger" @click="clearInfos()" >删除</button>
 			</div>
 		</div>
 		
@@ -32,7 +32,7 @@
 			<div class="col-md-12">
 				<table class="table table-hover">
 					<tr>
-						<th><input type="checkbox" id=""/></th>
+						<th><input type="checkbox" id="allcheck" @click="checkAll($event)"/></th>
 						<th>编号</th>
 						<th>姓名</th>
 						<th>性别</th>
@@ -42,7 +42,9 @@
 						<th>操作</th>
 					</tr>
 					<tr v-for="emp in list" :key="emp.id">
-						<td><input type="checkbox" id=""/></td>
+						<td>
+							<input type="checkbox" id="checkItem" :value="emp.id" v-model="checks"/>
+						</td>
 						<td>{{emp.id}}</td>
 						<td>{{emp.name}}</td>
 						<td>{{emp.gender==1?'女':'男'}}</td>
@@ -50,7 +52,7 @@
 						<td>{{emp.salary}}</td>
 						<td>{{emp.dept.name}}</td>
 						<td>
-							<button class="btn btn-primary btn-sm">
+							<button class="btn btn-primary btn-sm" @click="alter(emp)">
 								<span class="glyphicon" aria-hidden="true"></span>
 								编辑
 							</button>
@@ -68,7 +70,7 @@
 		<!-- 分页信息 start -->
 		<div class="row">
 			<!--分页文字信息  -->
-			<div class="col-md-6">第{{pageNum}} / {{pages}}页,共{{total}}条记录</div>
+			<div class="col-md-6">第{{pageNum}} / {{pages}}页,共{{total}}条记录   ###{{checks}}</div>
 			<!-- 分页条信息 -->
 			<div class="col-md-6">
 				<nav aria-label="Page navigation">
@@ -97,16 +99,83 @@
 			</div>
 		</div>
 		<!-- end 分页信息 -->
+
 		
 	</div>
 	<!-- end  页面内容  -->
+
+    <!-- (编辑)模态框 start -->
+    <div class="modal fade" id="modifyEmp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">修改信息</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">姓名</label>
+                            <div class="col-sm-10">
+                                <!-- <p class="form-control-static" id=""></p> -->
+                                <input type="text" v-model="name" class="form-control" placeholder="输入姓名"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">邮箱</label>
+                            <div class="col-sm-10">
+                                <input type="text" v-model="email" class="form-control" placeholder="email@xxx.com"/>
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">性别</label>
+                            <div class="col-sm-10">
+                                <label class="radio-inline">
+                                    <input type="radio" v-model="gender" name="gender" value="0"> 男
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" v-model="gender" name="gender" id="" value="1"> 女
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">薪资</label>
+                            <div class="col-sm-10">
+                                <input type="text" v-model="salary" name="salary" class="form-control" placeholder=""/>
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+	                        <label class="col-sm-2 control-label">所在部门</label>
+	                        <div class="col-sm-4">
+	                            <!-- 部门提交部门id即可 -->
+	                            <select class="form-control" v-model="dept.id">
+	                            	 <!--  :value="d.id" 此句不可加入，否则信息缺失(编辑对象) -->
+	                            	 <option v-for="d in department" :key="d.id">{{d.name}}</option>
+	                            </select>
+	                        </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" @click="editInfo()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- (编辑)模态框  end -->
 	
 	<script type="text/javascript" src="../../static/js/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="../../static/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="../../static/js/vue.js"></script>
 	<script type="text/javascript">
 		var url = "queryEmps?pn=1";
-		new Vue({
+		var vm = new Vue({
 			el: "#listPages",
 			data:{ 
 				   list: [],
@@ -117,7 +186,9 @@
 				    size: 5,
 				    total: 0,
 				    hasNextPage: false,
-				    hasPreviousPage: false
+				    hasPreviousPage: false,
+				    checks: [],
+				    emp: {} //实例
 			},
 			methods: {
 				getEmps: function(pageIndex) {  //获取一页
@@ -144,6 +215,9 @@
 						}
 					
 					});
+					//全选按钮， 取消选中
+					var allCheck = document.querySelector("#allcheck");
+					allCheck.checked = false;
 				},
 				varyPage: function(pageIndex) {  //更新页面索引，然后更新数据
                     if( pageIndex<=0 )
@@ -155,10 +229,11 @@
                 },
                 clearInfo: function(id) { //根据 id删除数据
                 	//this.list.splice(key,1);  //???
-                	console.log("编号: "+id);
+                	//console.log("编号: "+id);
                 	$.ajax({
                 		url: "clearEmp",
                 		type:"POST",
+                		async: false,
                 		data:{"id":id},
                 		success: function(text){
                 			//console.log(text);
@@ -168,8 +243,99 @@
                 	//不可放在success中
                 	var pageIndex = this.pageNum;
         			this.getEmps(pageIndex);//重新获取该页数据(本页刷新)
-                }
+                },
+                clearInfos: function() { //多个删除
+                	if( this.checks.length==0 )
+                	{
+                		alert("请选中要删除的信息！！");
+                		return false;
+                	}
+                	
+                	var arr = this.checks;
+                	//发送ajax请求
+                	$.ajax({
+                		url: "clearEmps",
+                		type: "POST",
+                		async: false,
+                		dataType: "text",  //dataType 指定的是 success中返回值的类型
+                		traditional: true,
+                		data: {ids: arr},
+                		success: function(info) {
+                			//console.log("你进来了没有？？");
+                			alert(info);
+                		},
+                		error: function(XMLHttpRequest, textStatus, errorThrown) {
+                			// 状态码
+                            console.log("状态码: "+XMLHttpRequest.status);
+                            // 状态
+                            console.log("状态: "+XMLHttpRequest.readyState);
+                            // 错误信息   
+                            console.log("errorInfo: "+textStatus);
+                		}
+                	
+                	});
+                	var pageIndex = this.pageNum;
+        			this.getEmps(pageIndex);//重新获取该页数据(本页刷新)
+        			//取消选中
+        			this.checks = [];
+        			var allCheck = document.querySelector("#allcheck");
+					allCheck.checked = false;
+                },
+				checkAll: function(e){   //全选/全不选
+					var checkObj = document.querySelectorAll('#checkItem');
+					 
+					// 判定全选checkbox的勾选状态
+					if(e.target.checked) {  //若选中， 全选
+						for(var i=0,len=checkObj.length; i<len; i++)
+						{
+							if( !checkObj[i].checked ) // 将未勾选的checkbox选项push到绑定数组中
+							{
+								checkObj[i].checked = true;//选中
+								this.checks.push( checkObj[i].value );//值加入
+								//console.log(typeof checkObj[i].value);//@ string
+							}
+						}
+					} else { //不选中，取消全选/全不选
+						this.checks = [];
+					}
 				
+				},
+				alter: function(emp) {
+					//this.emp = obj;
+					em.id = emp.id;
+					em.name = emp.name;
+					em.gender = emp.gender;
+					em.email = emp.email;
+					em.salary = emp.salary;
+					em.deptName = emp.dept.name;
+					em.dept = emp.dept;
+					
+					//=测试  √√√
+					//console.log(em.id+" "+em.gender+" "+em.salary);
+					
+					//发送ajax请求获取
+					$.ajax({
+						url: 'queryDepts',
+						type: 'get',
+						async: false,
+						success: function(result) {
+							//将json串转化成JSON对象
+							var jsonObject = JSON.parse(result);
+							em.department = jsonObject;
+						},
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
+							// 状态码
+                            console.log("状态码: "+XMLHttpRequest.status);
+                            // 状态
+                            console.log("状态: "+XMLHttpRequest.readyState);
+                            // 错误信息   
+                            console.log("errorInfo: "+textStatus);
+						}
+						
+					});
+					
+					$('#modifyEmp').modal({ backdrop: "static"});
+				}
 			},
 			mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
 		        self=this;
@@ -193,6 +359,40 @@
 		        })
 		    }
 		});
+		
+		//编辑信息  ××××××××××××
+		function alterInfo() 
+		{
+			console.log("编辑信息！");
+			$('#modifyEmp').modal({ backdrop: "static"});
+		}
+		//修改信息
+		var em = new Vue({
+			el: '#modifyEmp',
+			data: {
+				id: null,
+				name: '',
+				gender: null,
+				email: '',
+				salary: null,
+				deptName: '',
+				dept:{},
+				employee: {},
+				department: []
+			},
+			methods:{
+				editInfo: function() { //编辑信息(保存)
+					//console.log("id: "+id);
+					console.log("name: "+name);
+					console.log("gender: "+gender);
+					console.log("email: "+email);
+					console.log("salary: "+salary);
+					console.log("deptName: "+deptName);
+					console.log("dept: "+dept);
+				}
+			}
+		});
+		
 	</script>
 </body>
 </html>

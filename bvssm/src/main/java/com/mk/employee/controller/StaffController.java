@@ -14,7 +14,9 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.util.StringUtil;
+import com.mk.employee.entry.Department;
 import com.mk.employee.entry.Employee;
+import com.mk.employee.service.DeptService;
 import com.mk.employee.service.StaffService;
 
 @Controller
@@ -23,6 +25,8 @@ public class StaffController
 {
 	@Autowired
 	StaffService staffService;
+	@Autowired
+	DeptService deptService;
 	
 	//转向页面
 	@RequestMapping("/employees")
@@ -73,5 +77,41 @@ public class StaffController
 		
 		return mes;
 	}
+	
+	@RequestMapping("/clearEmps")
+	@ResponseBody
+	public String dropEmpInfoByIds( String[] ids)
+	{
+		int len = ids.length;
+		int counts = 0;
+		int[] array = new int[len];
+		
+		if( ids!=null ) {
+			for(int i=0; i<len; i++)
+				array[i]=Integer.parseInt(ids[i]);
+		}
+		
+		//删除
+		counts = staffService.removeEmpByIds(array);
+
+		String msg = (counts==len ? "删除成功!":"删除失败!");
+		return msg;
+	}
+	
+	/**
+	 * 获取所有部门
+	 * @return
+	 */
+	@RequestMapping("/queryDepts")
+	@ResponseBody
+	public String queryDepts()
+	{
+		List<Department> list = deptService.findDepts();
+		
+		String jsonStr = JSON.toJSONString(list);
+		
+		return jsonStr;
+	}
+	
 	
 }
