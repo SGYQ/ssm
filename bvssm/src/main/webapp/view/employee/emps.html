@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>员工信息列表</title>
+	<link rel="icon" type="image/x-icon" href="../../static/images/title.ico" /><!-- 标题图标 -->
 	
 	<link rel="stylesheet" type="text/css" href="../../static/css/bootstrap.min.css"/>
 	<style type="text/css">
@@ -22,7 +23,7 @@
 		<!-- 按钮 -->
 		<div class="row">
 			<div class="col-md-4 col-md-offset-8">
-				<button class="btn btn-primary">新增</button>
+				<button class="btn btn-primary" @click="appendEmp()">新增</button>
 				<button class="btn btn-danger" @click="clearInfos()" >删除</button>
 			</div>
 		</div>
@@ -134,17 +135,17 @@
                             <label class="col-sm-2 control-label">性别</label>
                             <div class="col-sm-10">
                                 <label class="radio-inline">
-                                    <input type="radio" v-model="gender" name="gender" value="0"> 男
+                                    <input type="radio" v-model="gender" value="0"> 男
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" v-model="gender" name="gender" id="" value="1"> 女
+                                    <input type="radio" v-model="gender" value="1"> 女
                                 </label>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">薪资</label>
                             <div class="col-sm-10">
-                                <input type="text" v-model="salary" name="salary" class="form-control" placeholder=""/>
+                                <input type="number" v-model="salary" class="form-control" placeholder=""/>
                                 <span class="help-block"></span>
                             </div>
                         </div>
@@ -152,9 +153,9 @@
 	                        <label class="col-sm-2 control-label">所在部门</label>
 	                        <div class="col-sm-4">
 	                            <!-- 部门提交部门id即可 -->
-	                            <select class="form-control" v-model="dept.id">
+	                            <select class="form-control" v-model="dept.id" >
 	                            	 <!--  :value="d.id" 此句不可加入，否则信息缺失(编辑对象) -->
-	                            	 <option v-for="d in department" :key="d.id">{{d.name}}</option>
+	                            	 <option v-for="d in department" :key="d.id" :value="d.id">{{d.name}}</option>
 	                            </select>
 	                        </div>
                         </div>
@@ -169,6 +170,71 @@
         </div>
     </div>
     <!-- (编辑)模态框  end -->
+	
+	<!-- (新增)模态框  start -->
+    <div class="modal fade" id="appendEmpModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">新增信息</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">姓名</label>
+                            <div class="col-sm-10">
+                                <!-- <p class="form-control-static" id=""></p> -->
+                                <input type="text" v-model="name" class="form-control" placeholder="输入姓名"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">邮箱</label>
+                            <div class="col-sm-10">
+                                <input type="text" v-model="email" class="form-control" placeholder="email@xxx.com"/>
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">性别</label>
+                            <div class="col-sm-10">
+                                <label class="radio-inline">
+                                    <input type="radio" v-model="gender" value="0"> 男
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" v-model="gender" value="1"> 女
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">薪资</label>
+                            <div class="col-sm-10">
+                                <input type="number" v-model="salary" class="form-control" placeholder="输入工资..."/>
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+	                        <label class="col-sm-2 control-label">所在部门</label>
+	                        <div class="col-sm-4">
+	                            <!-- 部门提交部门id即可 -->
+	                            <select class="form-control" v-model="dept.id">
+	                            	 <option v-for="d in department" :key="d.id" :value="d.id">{{d.name}}</option>
+	                            </select>
+	                        </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" @click="addInfo()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>	
+	<!-- end   (新增)模态框 -->
 	
 	<script type="text/javascript" src="../../static/js/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="../../static/js/bootstrap.min.js"></script>
@@ -301,19 +367,15 @@
 				
 				},
 				alter: function(emp) {
-					//this.emp = obj;
 					em.id = emp.id;
 					em.name = emp.name;
 					em.gender = emp.gender;
 					em.email = emp.email;
 					em.salary = emp.salary;
-					em.deptName = emp.dept.name;
 					em.dept = emp.dept;
+					em.employee = emp;
 					
-					//=测试  √√√
-					//console.log(em.id+" "+em.gender+" "+em.salary);
-					
-					//发送ajax请求获取
+					//发送ajax请求获取部门信息
 					$.ajax({
 						url: 'queryDepts',
 						type: 'get',
@@ -335,7 +397,42 @@
 					});
 					
 					$('#modifyEmp').modal({ backdrop: "static"});
+				},
+				//appendEmp() start(添加)
+				appendEmp: function() {
+					am.id = null;
+					am.name = '';
+					am.gender = null;
+					am.email = '';
+					am.salary = null;
+					am.dept = {};
+					am.department = [];
+					
+					//发送ajax请求获取部门信息
+					$.ajax({
+						url: 'queryDepts',
+						type: 'get',
+						async: false,
+						success: function(result) {
+							//将json串转化成JSON对象
+							var jsonObject = JSON.parse(result);
+							am.department = jsonObject;
+						},
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
+							// 状态码
+                            console.log("状态码: "+XMLHttpRequest.status);
+                            // 状态
+                            console.log("状态: "+XMLHttpRequest.readyState);
+                            // 错误信息   
+                            console.log("errorInfo: "+textStatus);
+						}
+						
+					});
+					
+					$("#appendEmpModal").modal( {backdrop:"static"} );
 				}
+				//end appendEmp()
+				
 			},
 			mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
 		        self=this;
@@ -375,24 +472,86 @@
 				gender: null,
 				email: '',
 				salary: null,
-				deptName: '',
 				dept:{},
 				employee: {},
 				department: []
 			},
 			methods:{
 				editInfo: function() { //编辑信息(保存)
-					//console.log("id: "+id);
-					console.log("name: "+name);
-					console.log("gender: "+gender);
-					console.log("email: "+email);
-					console.log("salary: "+salary);
-					console.log("deptName: "+deptName);
-					console.log("dept: "+dept);
-				}
+					/* console.log("id: "+this.id);
+					console.log("name: "+this.name);
+					console.log("gender: "+this.gender);
+					console.log("email: "+this.email);
+					console.log("salary: "+this.salary);
+					console.log("dept部门编号: "+this.dept.id); */
+					
+					var jsonData = {"id":this.id,"name":this.name,"gender":this.gender,
+							  "email":this.email,"salary":this.salary,"dept":this.dept};
+					
+					$.ajax({
+						url: 'editEmpInfo',
+						type:"POST",
+						data: { "editData":JSON.stringify(jsonData) },
+					    async: false,//同步
+						success: function(result) {
+							//console.log(result);	
+							alert(result);
+							$("#modifyEmp").modal("hide");
+						},
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
+							// 状态码
+                            console.log("状态码: "+XMLHttpRequest.status);
+                            // 状态
+                            console.log("状态: "+XMLHttpRequest.readyState);
+                            // 错误信息   
+                            console.log("errorInfo: "+textStatus);
+						}
+					});
+					
+					//更新当前页
+					vm.getEmps(vm.pageNum);
+				}// end editInfo()
+				
 			}
 		});
 		
+		// start 添加信息
+		var am = new Vue({
+			el: "#appendEmpModal",
+			data:{
+				name: '',
+				gender: null,
+				email: '', 
+				salary: null, 
+				dept: {},
+				department: []
+			}, 
+			methods: {
+				addInfo: function() {
+					var jsonData = {"name":this.name,"gender":this.gender,"email":this.email,
+									"salary":this.salary,"dept":this.dept};
+					$.ajax({
+						url: "appendInfo",
+						type:"POST",
+						data: {"addData":JSON.stringify(jsonData)},
+						async: false,//同步
+						success: function(result) {
+							alert(result);
+							$("#appendEmpModal").modal("hide");
+						},
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
+							// 状态码
+                            console.log("状态码: "+XMLHttpRequest.status+", 状态: "+XMLHttpRequest.readyState);
+                            // 错误信息   
+                            console.log("errorInfo: "+textStatus);
+						}
+					});
+				}
+			
+			}
+			
+		});
+		//添加信息  end
 	</script>
 </body>
 </html>

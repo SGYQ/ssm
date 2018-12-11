@@ -55,7 +55,7 @@ public class StaffController
 		//查询列表
 		List<Employee> list = staffService.findEmpList();
 		//传入连续分页的页面索引数量
-		PageInfo<Employee> pageInfo = new PageInfo<Employee>(list,5);
+		PageInfo<Employee> pageInfo = new PageInfo<Employee>(list,7);
 		
 		return JSON.toJSONString(pageInfo);
 	}
@@ -113,5 +113,35 @@ public class StaffController
 		return jsonStr;
 	}
 	
+	@RequestMapping("/editEmpInfo")
+	@ResponseBody
+	public String modifyEmpInfo(HttpServletRequest request)
+	{
+		String jsonStr = request.getParameter("editData");
+		//转化
+		Employee emp = JSON.parseObject(jsonStr, Employee.class);
+		//更新
+		int num = staffService.editEmpInfo(emp);
+		
+		return num==1?"修改成功!":"修改失败!";
+	}
+	
+	/**
+	 * 添加
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/appendInfo")
+	@ResponseBody
+	public String appendEmpInfo(HttpServletRequest request)
+	{
+		String jsonStr = request.getParameter("addData");
+		//转化
+		Employee employee = JSON.parseObject(jsonStr, Employee.class);
+		
+		int num = staffService.addEmpInfo(employee);
+		
+		return num==1?"添加成功!":"添加失败!";
+	}
 	
 }

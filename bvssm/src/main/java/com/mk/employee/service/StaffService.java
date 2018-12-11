@@ -55,4 +55,26 @@ public class StaffService
 		return counts;
 	}
 	
+	/**
+	 * 编辑员工信息
+	 * @param emp
+	 * @return
+	 */
+	public int editEmpInfo(Employee emp)
+	{
+		int res = staffDao.updateEmployee(emp);
+		return res;
+	}
+	
+	/**
+	 * 添加
+	 * @param emp
+	 * @return
+	 */
+	public int addEmpInfo(Employee emp)
+	{
+		int num = staffDao.insertEmployee(emp);
+		return num;
+	}
+	
 }

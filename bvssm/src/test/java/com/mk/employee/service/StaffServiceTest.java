@@ -47,7 +47,7 @@ public class StaffServiceTest
 	@Test
 	public void test1()
 	{
-		PageHelper.startPage(4, 3);
+		PageHelper.startPage(4, 5);
 		// startPage后面紧跟的这个查询就是一个分页查询
 		List<Employee> emps = staffService.findEmpList();
 		// 使用pageInfo包装查询后的结果，只需要将pageInfo交给页面就行了。

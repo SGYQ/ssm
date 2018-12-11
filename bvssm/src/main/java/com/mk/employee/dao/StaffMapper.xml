@@ -12,6 +12,7 @@
 		
 		<association property="dept" javaType="com.mk.employee.entry.Department">
 			<result column="deptName" property="name"/>
+			<result column="d_id" property="id"/>
 		</association>
 	</resultMap>
 
@@ -34,6 +35,18 @@
 	<select id="selectEmployeeById" parameterType="int" resultType="com.mk.employee.entry.Employee">
 		select * from emp where id = #{id}
 	</select>
+	
+	<!-- 修改信息 -->
+	<update id="updateEmployee" parameterType="com.mk.employee.entry.Employee" >
+		UPDATE emp SET name=#{name},gender=#{gender},email=#{email},d_id=#{dept.id},salary=#{salary}
+		WHERE id = #{id};
+	</update>
+	
+	<!-- 添加 -->
+	<insert id="insertEmployee" parameterType="com.mk.employee.entry.Employee">
+		INSERT INTO emp(name,gender,email,d_id,salary) 
+		VALUES(#{name}, #{gender}, #{email}, #{dept.id}, #{salary})
+	</insert>
 	
 	
 </mapper>

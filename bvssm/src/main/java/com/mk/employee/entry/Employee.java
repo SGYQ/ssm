@@ -17,12 +17,16 @@ public class Employee
 	{
 	}
 	
+	
+	
 	@Override
 	public String toString()
 	{
 		return "Employee [id=" + id + ", name=" + name + ", gender=" + gender + ", email=" + email + ", salary="
-				+ salary + "]";
+				+ salary + ", dept=" + dept + "]";
 	}
+
+
 	public int getId()
 	{
 		return id;
