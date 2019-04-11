@@ -1,6 +1,6 @@
 package com.mk.employee.entry;
 /**
- * <p>员工实体
+ * <p> 员工实体信息
  * @author admin
  *
  */
